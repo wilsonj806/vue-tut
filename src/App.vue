@@ -1,19 +1,19 @@
 <template>
   <div id="app">
-    <p>{{msg}}</p>
+    <Todos v-bind:todos="todos"/>
   </div>
 </template>
 
 <script>
+import Todos from './components/Todos'
 
 export default {
   name: 'app',
   components: {
-
+    Todos
   },
   data() {
     return {
-      msg: 'Hello',
       todos: [
         {
           id: 0,
