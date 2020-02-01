@@ -180,3 +180,77 @@ export default {
 ```
 
 So when we click on the delete button on the todo, it deletes it from the app data.
+
+## Interactivity
+We've got events, which is great but it's not super interactive just yet. To demo this, we're going to make our `AddTodo` component which does exactly that. A basic AddTodo component has an input and a submit button, so we'll need some way to update the value of the input as we go, and we need to have a submit handler.
+
+For the input, we first need to define it's value as part of the component's data like so:
+
+```html
+<script>
+export default {
+  name: "AddTodo",
+  data() {
+    return {
+      title: ''
+    }
+  }
+}
+</script>
+```
+
+And then we connect our data to our template using `v-model` like so:
+```xml
+<template>
+  <div>
+    <form>
+      <input v-model="title" type="text" name="title" placeholder="Add Todo"/>
+      <input class="btn" type="submit" value="Submit"/>
+    </form>
+  </div>
+</template>
+```
+
+Where the value for `v-model` corresponds to the title property returned by `data()`.
+
+So that handles input changes, now for form submission. It functions the same way as a click event:
+
+```xml
+<template>
+  <div>
+    <form @submit="addTodo">
+      <input v-model="title" type="text" name="title" placeholder="Add Todo"/>
+      <input class="btn" type="submit" value="Submit"/>
+    </form>
+  </div>
+</template>
+```
+
+We aren't pushing this up to the parent container just yet as we want to do some data processing like so:
+
+```html
+<script>
+import uuid from 'uuid'
+
+export default {
+  name: "AddTodo",
+  data() {
+    return {
+      title: ''
+    }
+  },
+  methods: {
+    addTodo() {
+      const newTodo = {
+        id: uuid.v4(),
+        title: this.title,
+        completed: false
+      };
+
+      // Send new todo up to the parent
+      this.$emit('add-todo', newTodo);
+    }
+  }
+}
+</script>
+```
