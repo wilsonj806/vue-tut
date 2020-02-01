@@ -56,6 +56,8 @@ If we want to pass data along to another component, then we'd need to bind that 
 
 And the syntax for it is: `v-bind:<prop-name-in-child> ="<prop-value-from-parent>"`
 
+`v-bind` functionally just binds a new attribute with the desired name and value, to the desired function. It also works on existing attributes like `class` or `href`
+
 We can then use that value in the `Todos` component as a prop like so:
 
 ```html
@@ -83,3 +85,98 @@ The syntax is pretty funky because of the `vfor="todo in todos"` but it semantic
 - vue directive: for each todo in the todos array => render stuff in the children markup
 
 In addition to `v-for`, we also need to bind a key to each child element just like React requires it. We thus need to add `v-bind:key` in.
+
+## Vue Events
+Event handling works a bit differently in Vue. Lookss like the below for `TodoItem` in the template:
+```xml
+<template>
+  <div class="todo-item" v-bind:class="{'is-complete':todo.completed}">
+    <input type="checkbox" v-on:change="markComplete"/>
+    <p>{{ todo.title }}</p>
+  </div>
+</template>
+```
+
+Where we use the `v-on:` directive and identify the event as `change`, and we also add the event handler name which is "markComplete".
+
+Of course this event handler doesn't exist, so we add it into our scripts section like so:
+
+```html
+<script>
+export default {
+  name: 'TodoItem',
+  props:[
+    'todo'
+  ],
+  methods: {
+    markComplete() {
+      this.todo.completed = !this.todo.completed
+    }
+  },
+}
+</script>
+```
+
+That's for one off events that are local to that particular compmonent, but what if we want to do stuff with that event from higher up the component tree? In this situation, if we want to delete a todo, we'd need to delete it from the App as well. To do this, we use event emitters and it looks like the below:
+
+```xml
+<template>
+  <div class="todo-item" v-bind:class="{'is-complete':todo.completed}">
+      <!-- additional markup not included -->
+      <!-- registering a click event and emitting the event-->
+      <button class="del" type="button" @click="$emit('del-todo', todo.id)">x</button>
+  </div>
+</template>
+```
+
+Where we have a button element with an `@click` attribute with a value of `$emit()`. And what we're emitting is a Vue event called "del-todo" with the todo.id as the value.
+
+After we do that, we need to catch the event higher up in the tree and it looks like so in Todos and eventually App:
+
+```xml
+<!-- Todo -->
+<template>
+  <div>
+    <!-- Renders todos.length number of divs with a unique key -->
+    <div v-for="todo in todos" v-bind:key="todo.id">
+      <TodoItem v-bind:todo="todo" v-on:del-todo="$emit('del-todo', todo.id)"/>
+    </div>
+  </div>
+</template>
+```
+
+In the Todo component we add `v-on:`, then the event name, and then the name of the callback we want to call. The Todo component needs to then emit it's own event so that App can modify state.
+
+```xml
+<!-- App -->
+<template>
+  <div id="app">
+    <Todos v-bind:todos="todos" v-on:del-todo="deleteTodo"/>
+  </div>
+</template>
+```
+
+And we add a deleteTodo method to the default export like so:
+
+```html
+<script>
+import Todos from './components/Todos'
+
+export default {
+  name: 'app',
+  components: {
+    Todos
+  },
+  data() {
+    return {...stuff}
+  },
+  methods: {
+    deleteTodo(id) {
+      this.todos = this.todos.filter(todo => todo.id !== id)
+    }
+  }
+}
+</script>
+```
+
+So when we click on the delete button on the todo, it deletes it from the app data.
