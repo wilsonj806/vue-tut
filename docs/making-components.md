@@ -254,3 +254,10 @@ export default {
 }
 </script>
 ```
+
+## Routing
+Vue has it's own router included, but you need to add it in through Vue plugins.
+
+It's got it's own dedicated file with a list of routes and the corresponding component similar to React Router. See `router/index.js` for more.
+
+To navigate around, we use the `<router-link>` component and routes are rendered using the `<router-view>` component.
