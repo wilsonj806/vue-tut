@@ -6,6 +6,7 @@ A quick Vue Tutorial based on Traversy Media's [Vue Crash Course](https://www.yo
 Additional Notes below:
 - [Starting up](./docs/starting-up.md)
 - [Basic Vue Component Syntax](./docs/vue-component-syntax.md)
+- [Making Vue Components](./docs/making-components.md)
 
 ## Project setup
 ```
